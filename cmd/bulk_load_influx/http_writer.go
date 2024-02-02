@@ -4,6 +4,7 @@ package main
 
 import (
 	"bytes"
+	"encoding/base64"
 	"fmt"
 	"log"
 	"time"
@@ -72,20 +73,27 @@ var (
 	textPlain = []byte("text/plain")
 )
 
+// curl -i -u "root:" \
+// -XPOST "http://127.0.0.1:8902/api/v1/write?db=public" \
+// -d "wind,station=XiaoMaiDao speed=57,direction=56 1673712000000000000"
+
 // WriteLineProtocol writes the given byte slice to the HTTP server described in the Writer's HTTPWriterConfig.
 // It returns the latency in nanoseconds and any error received while sending the data over HTTP,
 // or it returns a new error if the HTTP response isn't as expected.
 func (w *HTTPWriter) WriteLineProtocol(body []byte, isGzip bool) (int64, error) {
+	auth := fmt.Sprintf("Basic %s",base64.StdEncoding.EncodeToString([]byte("root:")))
+
 	req := fasthttp.AcquireRequest()
 	req.Header.SetContentTypeBytes(textPlain)
 	req.Header.SetMethodBytes(post)
 	req.Header.SetRequestURIBytes(w.url)
+	req.Header.Set("Authorization", auth)
 	if isGzip {
 		req.Header.Add("Content-Encoding", "gzip")
 	}
-	if w.c.AuthToken != "" {
-		req.Header.Add("Authorization", fmt.Sprintf("Token %s", w.c.AuthToken))
-	}
+	// if w.c.AuthToken != "" {
+	// 	req.Header.Add("Authorization", fmt.Sprintf("Token %s", w.c.AuthToken))
+	// }
 	req.SetBody(body)
 
 	resp := fasthttp.AcquireResponse()

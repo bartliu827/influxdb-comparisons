@@ -174,6 +174,8 @@ func (l *InfluxBulkLoad) Validate() {
 }
 
 func (l *InfluxBulkLoad) CreateDb() {
+	return 
+
 	listDatabasesFn := l.listDatabases
 	createDbFn := l.createDb
 
@@ -295,6 +297,9 @@ func (l *InfluxBulkLoad) PrepareProcess(i int) {
 		}
 		url = c.Host + "/write?consistency=" + l.consistency + "&db=" + neturl.QueryEscape(c.Database)
 	}
+
+	// http://127.0.0.1:8902/api/v1/write?db=public
+	url = c.Host + "/api/v1/write?db=" + neturl.QueryEscape(c.Database)
 	l.configs[i].writer = NewHTTPWriter(*c, url)
 }
 
