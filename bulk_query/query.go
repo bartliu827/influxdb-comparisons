@@ -7,8 +7,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/influxdata/influxdb-comparisons/bulk_load"
-	"github.com/influxdata/influxdb-comparisons/util/report"
 	"io"
 	"io/ioutil"
 	"log"
@@ -21,6 +19,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/influxdata/influxdb-comparisons/bulk_load"
+	"github.com/influxdata/influxdb-comparisons/util/report"
 )
 
 type BulkQuery interface {
@@ -428,10 +429,10 @@ loop:
 	// channel when done:
 	log.Println("Waiting for workers to finish")
 	waitCh := make(chan int)
-	waitFinished := false
+	//waitFinished := false
 	go func() {
 		workersGroup.Wait()
-		waitFinished = true
+		//waitFinished = true
 		waitCh <- 1
 	}()
 	waitTimer := time.NewTimer(time.Minute * 10)
